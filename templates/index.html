@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>VisionQC-AI | Industrial Quality Inspection</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav>
+
+    <div class="logo">
+
+        <i class="fa-solid fa-microchip"></i>
+
+        VisionQC-AI
+
+    </div>
+
+    <ul>
+
+        <li><a href="#dashboard">Dashboard</a></li>
+
+        <li><a href="#inspection">Inspection</a></li>
+
+        <li><a href="#history">History</a></li>
+
+        <li><a href="#about">About</a></li>
+
+    </ul>
+
+</nav>
+
+<!-- ================= DASHBOARD ================= -->
+
+<section id="dashboard">
+
+<div class="container">
+
+<div class="hero">
+
+<h1>
+
+AI Powered Industrial Quality Inspection
+
+</h1>
+
+<p>
+
+Upload a casting image and let VisionQC-AI detect
+whether the product is GOOD or DEFECTIVE.
+
+</p>
+
+</div>
+
+<!-- ================= STATS ================= -->
+
+<div class="stats">
+
+<div class="stat-card">
+
+<i class="fa-solid fa-brain"></i>
+
+<h3>AI Model</h3>
+
+<h2>MobileNetV2</h2>
+
+</div>
+
+<div class="stat-card">
+
+<i class="fa-solid fa-layer-group"></i>
+
+<h3>Classes</h3>
+
+<h2>2</h2>
+
+</div>
+
+<div class="stat-card">
+
+<i class="fa-solid fa-bullseye"></i>
+
+<h3>Accuracy</h3>
+
+<h2>98.6%</h2>
+
+</div>
+
+<div class="stat-card">
+
+<i class="fa-solid fa-image"></i>
+
+<h3>Input Size</h3>
+
+<h2>224 × 224</h2>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= INSPECTION ================= -->
+
+<section id="inspection">
+
+<div class="container">
+
+<div class="card">
+
+<h2>
+
+<i class="fa-solid fa-upload"></i>
+
+Upload Casting Image
+
+</h2>
+
+<form action="/"
+      method="POST"
+      enctype="multipart/form-data">
+
+<input type="file"
+
+       name="image"
+
+       accept="image/*"
+
+       required>
+
+<button type="submit">
+
+<i class="fa-solid fa-magnifying-glass"></i>
+
+Inspect Product
+
+</button>
+
+</form>
+
+</div>
+
+{% if prediction %}
+
+<div class="result-section">
+
+<!-- LEFT SIDE -->
+
+<div class="card">
+
+<h2>
+
+<i class="fa-solid fa-image"></i>
+
+Uploaded Image
+
+</h2>
+
+<img class="preview"
+
+src="{{ url_for('static',
+filename='uploads/' + image) }}"
+
+alt="Uploaded Image">
+
+</div>
+
+<!-- RIGHT SIDE -->
+
+<div class="card">
+
+<h2>
+
+<i class="fa-solid fa-robot"></i>
+
+AI Prediction
+
+</h2>
+{% if prediction == "ok_front" %}
+
+<div class="good">
+
+<i class="fa-solid fa-circle-check"></i>
+
+GOOD PRODUCT
+
+</div>
+
+{% else %}
+
+<div class="bad">
+
+<i class="fa-solid fa-circle-xmark"></i>
+
+DEFECTIVE PRODUCT
+
+</div>
+
+{% endif %}
+
+<h3>Confidence Score</h3>
+
+<div class="progress">
+
+<div class="progress-bar"
+
+style="width:{{confidence}}%">
+
+</div>
+
+</div>
+
+<h2>{{confidence}}%</h2>
+<br>
+
+<a href="/download_report" class="download-btn">
+
+    <i class="fa-solid fa-file-pdf"></i>
+
+    Download Inspection Report
+
+</a>
+
+</div>
+
+</div>
+
+<!-- ================= AI INFORMATION ================= -->
+
+<div class="card">
+
+<h2>
+
+<i class="fa-solid fa-circle-info"></i>
+
+AI Model Information
+
+</h2>
+
+<div class="info-grid">
+
+<div class="info-box">
+
+<h4>Model</h4>
+
+<p>MobileNetV2</p>
+
+</div>
+
+<div class="info-box">
+
+<h4>Framework</h4>
+
+<p>TensorFlow / Keras</p>
+
+</div>
+
+<div class="info-box">
+
+<h4>Classification</h4>
+
+<p>Binary Classification</p>
+
+</div>
+
+<div class="info-box">
+
+<h4>Input Resolution</h4>
+
+<p>224 × 224 Pixels</p>
+
+</div>
+
+<div class="info-box">
+
+<h4>Training Accuracy</h4>
+
+<p>98.6%</p>
+
+</div>
+
+<div class="info-box">
+
+<h4>Prediction Speed</h4>
+
+<p>&lt; 1 Second</p>
+
+</div>
+
+</div>
+
+</div>
+
+{% endif %}
+
+</div>
+
+</section>
+
+<!-- ================= HISTORY ================= -->
+<section id="history">
+
+<div class="container">
+
+<div class="card">
+
+<h2>
+
+<i class="fa-solid fa-clock-rotate-left"></i>
+
+Prediction History
+
+</h2>
+<form action="/clear_history"
+      method="POST"
+      onsubmit="return confirm('Are you sure you want to clear all prediction history?');">
+
+    <button class="clear-btn" type="submit">
+        🗑 Clear History
+    </button>
+
+</form>
+
+<br>
+
+{% if history %}
+
+<table class="history-table">
+
+<thead>
+
+<tr>
+
+<th>Image</th>
+
+<th>Prediction</th>
+
+<th>Confidence</th>
+
+<th>Date & Time</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for row in history %}
+
+<tr>
+
+<td>{{ row[0] }}</td>
+
+<td>
+
+{% if row[1] == "ok_front" %}
+
+<span class="good-text">
+
+GOOD PRODUCT
+
+</span>
+
+{% else %}
+
+<span class="bad-text">
+
+DEFECTIVE PRODUCT
+
+</span>
+
+{% endif %}
+
+</td>
+
+<td>{{ row[2] }}%</td>
+
+<td>{{ row[3] }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% else %}
+
+<p>No predictions yet.</p>
+
+{% endif %}
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= ABOUT ================= -->
+
+<section id="about">
+
+<div class="container">
+
+<div class="card">
+
+<h2>
+
+<i class="fa-solid fa-circle-info"></i>
+
+About VisionQC-AI
+
+</h2>
+
+<p style="line-height:1.8; font-size:17px; color:#555;">
+
+<b>VisionQC-AI</b> is an AI-powered industrial quality inspection
+system developed using <b>TensorFlow</b>, <b>Flask</b>, and
+<b>MobileNetV2</b>.
+
+The system automatically classifies manufacturing products into
+<b>GOOD PRODUCT</b> or <b>DEFECTIVE PRODUCT</b> using Deep Learning
+and Computer Vision.
+
+</p>
+
+<br>
+
+<div class="info-grid">
+
+<div class="info-box">
+
+<h4>Backend</h4>
+
+<p>Python Flask</p>
+
+</div>
+
+<div class="info-box">
+
+<h4>Deep Learning</h4>
+
+<p>TensorFlow / Keras</p>
+
+</div>
+
+<div class="info-box">
+
+<h4>Architecture</h4>
+
+<p>MobileNetV2</p>
+
+</div>
+
+<div class="info-box">
+
+<h4>Dataset</h4>
+
+<p>Casting Product Dataset</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+<h2>
+
+🤖 VisionQC-AI
+
+</h2>
+
+<br>
+
+<p>
+
+AI Powered Industrial Quality Inspection System
+
+</p>
+
+<br>
+
+<p>
+
+Developed using
+
+<strong>Python • Flask • TensorFlow • MobileNetV2</strong>
+
+</p>
+
+<br>
+
+<p>
+
+© 2026 VisionQC-AI
+
+</p>
+
+</footer>
+
+<!-- ================= SCROLL BUTTON ================= -->
+
+<button id="topBtn">
+
+<i class="fa-solid fa-arrow-up"></i>
+
+</button>
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+let topButton=document.getElementById("topBtn");
+
+window.onscroll=function(){
+
+if(document.body.scrollTop>300 ||
+document.documentElement.scrollTop>300){
+
+topButton.style.display="block";
+
+}else{
+
+topButton.style.display="none";
+
+}
+
+};
+
+topButton.onclick=function(){
+
+window.scrollTo({
+
+top:0,
+
+behavior:"smooth"
+
+});
+
+};
+
+</script>
+
+</body>
+
+</html>
